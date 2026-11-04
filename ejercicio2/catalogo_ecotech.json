@@ -1,0 +1,18 @@
+[
+    {
+        "codigo": "PS-001",
+        "nombre": "EcoPanel Max 400W",
+        "stock": 15,
+        "tipo_dispositivo": "Panel Solar",
+        "potencia_w": 400,
+        "tipo_celda": "Monocristalino"
+    },
+    {
+        "codigo": "PS-002",
+        "nombre": "SunPower Slim 250W",
+        "stock": 8,
+        "tipo_dispositivo": "Panel Solar",
+        "potencia_w": 250,
+        "tipo_celda": "Policristalino"
+    }
+]
