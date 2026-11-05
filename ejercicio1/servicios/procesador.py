@@ -1,37 +1,50 @@
-from modelos.sensor import Sensor
+import pandas as pd
+
 def limpiar_registro_sensor(registro_raw: dict) -> dict:
     """
-    Punto A: Normaliza un diccionario crudo de un sensor.
-    Retorna un nuevo diccionario estandarizado.
+    Punto A: Normalizo un registro de sensor crudo utilizando Pandas.
     """
-    sensor_id_limpio = registro_raw.get("sensor_id", "").strip()
-    temp_raw = str(registro_raw.get("temperatura", "0"))
-    temp_limpia = temp_raw.upper().replace("C", "").strip()
-    try:
-        temperatura_float = float(temp_limpia)
-    except ValueError:
-        temperatura_float = 0.0  
-    ubicacion_raw = registro_raw.get("ubicacion")
-    if ubicacion_raw and ubicacion_raw.strip():
-        ubicacion_limpia = ubicacion_raw.strip()
+    df = pd.DataFrame([registro_raw])
+    
+    if "sensor_id" in df.columns:
+        df["sensor_id"] = df["sensor_id"].astype(str).str.strip()
+        
+    if "temperatura" in df.columns:
+        df["temperatura"] = (
+            df["temperatura"]
+            .astype(str)
+            .str.upper()
+            .str.replace("C", "", regex=False)
+            .str.strip()
+        )
+        df["temperatura"] = pd.to_numeric(df["temperatura"], errors="coerce")
+        
+    if "ubicacion" not in df.columns or pd.isna(df.loc[0, "ubicacion"]) or str(df.loc[0, "ubicacion"]).strip() == "":
+        df["ubicacion"] = "Planta Genérica"
     else:
-        ubicacion_limpia = "Planta Desconocida"  # Valor por defecto seguro
-    sensor_obj = Sensor(sensor_id_limpio, temperatura_float, ubicacion_limpia)
-    return sensor_obj.to_dict()
+        df["ubicacion"] = df["ubicacion"].astype(str).str.strip()
+        
+    return df.iloc[0].to_dict()
+
+
 def generar_resumen_sensores(lista_sensores_limpios: list, umbral_temperatura: float) -> tuple:
     """
-    Punto B: Procesa la lista de sensores limpios y un umbral.
-    Retorna una tupla: (lista_sensores_alerta, promedio_temperatura)
+    Punto B: Se genera el resumen estadístico calculando el promedio mediante acumulación
+    y filtrando las alertas mediante Pandas.
     """
-    lista_sensores_alerta = []
-    suma_temperaturas = 0.0
-    total_sensores = len(lista_sensores_limpios)
-    if total_sensores == 0:
+    if not lista_sensores_limpios:
         return [], 0.0
+        
+    # 1. Cálculo del promedio acumulando los valores 
+    temperaturas_acumuladas = 0.0
     for sensor in lista_sensores_limpios:
-        temp = sensor["temperatura"]
-        suma_temperaturas += temp
-        if temp > umbral_temperatura:
-            lista_sensores_alerta.append(sensor["sensor_id"])
-    promedio_temperatura = suma_temperaturas / total_sensores
+        temperaturas_acumuladas += float(sensor["temperatura"])
+        
+    promedio_temperatura = temperaturas_acumuladas / len(lista_sensores_limpios)
+    
+    # 2. Mapeo y filtrado de alertas usando Pandas
+    df_sensores = pd.DataFrame(lista_sensores_limpios)
+    sensores_en_alerta = df_sensores[df_sensores["temperatura"] > umbral_temperatura]
+    lista_sensores_alerta = sensores_en_alerta["sensor_id"].tolist()
+    
     return lista_sensores_alerta, promedio_temperatura

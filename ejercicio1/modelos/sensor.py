@@ -2,6 +2,9 @@ class Sensor:
     """
     Clase que modela un registro de sensor sanitizado de EcoTech Solutions.
     """
+    sensor_id: str
+    temperatura: float 
+    ubicacion: str    
     def __init__(self, sensor_id: str, temperatura: float, ubicacion: str):
         self.sensor_id = sensor_id
         self.temperatura = temperatura
