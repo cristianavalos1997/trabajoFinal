@@ -6,7 +6,7 @@ class GestorInventario:
         """Serializa y almacena la lista de dispositivos ecológicos en un archivo JSON."""
         datos_catalogo = []
         for dispositivo in lista_dispositivos:
-            # utilizo método polimórfico de la ficha técnica
+            # utilizo método de polimorfismo de la ficha técnica
             datos_catalogo.append(dispositivo.obtener_ficha_tecnica())
         
         try:

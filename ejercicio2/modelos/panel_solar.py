@@ -1,5 +1,10 @@
 from modelos.dispositivo_ecologico import DispositivoEcológico
 class PanelSolar(DispositivoEcológico):
+    codigo: str
+    nombre: str
+    stock: int
+    potencia_w: float
+    tipo_celda: str
     def __init__(self, codigo: str, nombre: str, stock: int, potencia_w: float, tipo_celda: str):
         super().__init__(codigo, nombre, stock)
         self.potencia_w = potencia_w

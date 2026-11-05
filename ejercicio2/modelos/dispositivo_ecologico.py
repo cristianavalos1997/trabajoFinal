@@ -1,10 +1,13 @@
 from excepciones.stock_invalido_error import StockInvalidoError
 class DispositivoEcológico:
+    codigo: str
+    nombre: str
+    _stock: int
     def __init__(self, codigo: str, nombre: str, stock: int):
         self.codigo = codigo
         self.nombre = nombre
-        self._stock = 0  # Inicializamos usando el setter para validar
-        self.stock = stock  # Llama al setter
+        self._stock = 0  # Inicializo usando el setter para validar
+        self.stock = stock  # Se llama al setter
     @property
     def stock(self):
         return self._stock
