@@ -1,7 +1,6 @@
 import servicios.procesador
 
 def main():
-    # Represento Estructura cruda utilizando listas.
     registros_crudos = [
         {
             "sensor_id": [" SENSOR-001 "],
@@ -11,7 +10,7 @@ def main():
         {
             "sensor_id": ["SENSOR-002"],
             "temperatura": [" 29.8 C "],
-            "ubicacion": [None]  # Usando None para indicar ubicación faltante
+            "ubicacion": ["Planta Sur"]  
         },
         {
             "sensor_id": [" SENSOR-003"],
@@ -20,7 +19,7 @@ def main():
         },
         {
             "sensor_id": ["SENSOR-004"],
-            "temperatura": ["31.4C"],
+            "temperatura": ["31.4C"], 
             "ubicacion": ["Planta Este"]
         }
     ]
@@ -28,11 +27,17 @@ def main():
     print("--- INICIANDO PROCESAMIENTO DE SENSORES ECOTECH CON PANDAS ---")
     
     sensores_limpios = []
+    
+    # Recorro los registros utilizando try-except para que el programa no se rompa
     for registro in registros_crudos:
-        sensor_normalizado = servicios.procesador.limpiar_registro_sensor(registro)
-        sensores_limpios.append(sensor_normalizado)
+        try:
+            sensor_normalizado = servicios.procesador.limpiar_registro_sensor(registro)
+            sensores_limpios.append(sensor_normalizado)
+        except ValueError as e:
+            # Capturo el error, mostrando un mensaje y asi continuar con el siguiente
+            print(f"    ⚠️  [ADVERTENCIA] Registro omitido: {e}")
         
-    print(f"\n[OK] Se normalizaron {len(sensores_limpios)} registros con éxito usando DataFrames.")
+    print(f"\n[OK] Se normalizaron {len(sensores_limpios)} registros con éxito de forma segura.")
     
     UMBRAL_PRUEBA = 25.0
     sensores_alerta, promedio_global = servicios.procesador.generar_resumen_sensores(sensores_limpios, UMBRAL_PRUEBA)
@@ -44,9 +49,9 @@ def main():
     
     if sensores_alerta:
         for sensor_id in sensores_alerta:
-            print(f"    ⚠️    Alerta crítica en dispositivo: {sensor_id}")
+            print(f"        ⚠️     Alerta crítica en dispositivo: {sensor_id}")
     else:
-        print("    ✅ Ningún dispositivo supera el umbral establecido.")
+        print("        ✅ Ningún dispositivo supera el umbral establecido.")
         
     print("=====================================================")
 
